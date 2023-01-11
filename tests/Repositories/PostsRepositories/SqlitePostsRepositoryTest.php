@@ -10,6 +10,7 @@ use Tgu\Savenko\Blog\Exceptions\PostNotFoundException;
 use Tgu\Savenko\Blog\Post;
 use Tgu\Savenko\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use Tgu\Savenko\Blog\UUID;
+use Tgu\Savenko\PhpUnit\Blog\DummyLogger;
 
 class SqlitePostsRepositoryTest extends TestCase
 {
@@ -21,7 +22,7 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(PostNotFoundException::class);
         $this->expectExceptionMessage('Cannot get post: newpost');
@@ -44,7 +45,7 @@ class SqlitePostsRepositoryTest extends TestCase
                 ':text_post'=>'textpost']);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $repository->savePost(new Post(
             new UUID('4f6ab02c-3a8a-49bb-b232-6e9dbbd36b94'),
@@ -65,7 +66,7 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(PostNotFoundException::class);
         $this->expectExceptionMessage('Cannot get post: 4f6ab02c-3a8a-49bb-b232-6e9dbbd36b94');

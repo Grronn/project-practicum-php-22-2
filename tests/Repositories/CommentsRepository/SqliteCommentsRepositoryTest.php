@@ -10,9 +10,13 @@ use Tgu\Savenko\Blog\Exceptions\CommentNotFoundException;
 use Tgu\Savenko\Blog\Exceptions\InvalidArgumentException;
 use Tgu\Savenko\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use Tgu\Savenko\Blog\UUID;
+use Tgu\Savenko\PhpUnit\Blog\DummyLogger;
 
 class SqliteCommentsRepositoryTest extends TestCase
 {
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testItTrowsAnExceptionWhenCommentNotFound():void
     {
         $connectionStub = $this->createStub(PDO::class);
@@ -21,7 +25,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(CommentNotFoundException::class);
         $this->expectExceptionMessage('Cannot get comment: newComment');
@@ -45,7 +49,7 @@ class SqliteCommentsRepositoryTest extends TestCase
             ]);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $repository->saveComment( new Comment(
             new UUID('7a5db242-1163-47d6-ad0d-866571bfb95f'),
@@ -66,7 +70,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(CommentNotFoundException::class);
         $this->expectExceptionMessage('Cannot get comment: d97ad24b-7b10-4c7a-8a60-188d171d22d4');

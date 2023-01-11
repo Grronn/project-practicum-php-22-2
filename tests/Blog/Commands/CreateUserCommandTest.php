@@ -12,6 +12,7 @@ use Tgu\Savenko\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use Tgu\Savenko\Blog\User;
 use Tgu\Savenko\Blog\UUID;
 use Tgu\Savenko\Person\Name;
+use Tgu\Savenko\PhpUnit\Blog\DummyLogger;
 
 class CreateUserCommandTest extends TestCase
 {
@@ -53,17 +54,23 @@ class CreateUserCommandTest extends TestCase
     public function testItThrowsAnExceptionWhenUserAlreadyExist():void
     {
         $command = new CreateUserCommand(
-            $this->makeUsersRepository()
+            $this->makeUsersRepository(),
+            new DummyLogger(),
         );
         $this->expectException(CommandException::class);
         $this->expectExceptionMessage('User already exists Ivan');
 
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments([
+            'username' => 'Ivan',
+            'first_name' => 'Ivan',
+            'last_name' => 'Ivanov'
+        ]));
     }
     public function testItRequiresLastName(): void
     {
         $command = new CreateUserCommand(
-            $this->makeUsersRepository()
+            $this->makeUsersRepository(),
+            new DummyLogger(),
         );
 
         $this->expectException(ArgumentsException::class);
@@ -78,7 +85,8 @@ class CreateUserCommandTest extends TestCase
     public function testItRequiresFirstName(): void
     {
         $command = new CreateUserCommand(
-            $this->makeUsersRepository()
+            $this->makeUsersRepository(),
+            new DummyLogger()
         );
 
         $this->expectException(ArgumentsException::class);
@@ -93,7 +101,8 @@ class CreateUserCommandTest extends TestCase
     {
         $userRepository = $this->makeUsersRepository();
         $command = new CreateUserCommand(
-            $userRepository
+            $userRepository,
+            new DummyLogger()
         );
 
 

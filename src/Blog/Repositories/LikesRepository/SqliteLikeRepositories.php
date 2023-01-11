@@ -4,13 +4,14 @@ namespace Tgu\Savenko\Blog\Repositories\LikesRepository;
 
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 use Tgu\Savenko\Blog\Exceptions\LikeNotFoundException;
 use Tgu\Savenko\Blog\Likes;
 use Tgu\Savenko\Blog\UUID;
 
 class SqliteLikeRepositories implements LikesRepositoryInterface
 {
-    public function __construct(private PDO $connection)
+    public function __construct(private PDO $connection, private LoggerInterface $logger)
     {
 
     }
@@ -23,12 +24,14 @@ class SqliteLikeRepositories implements LikesRepositoryInterface
     }
     public function saveLike(Likes $likes): void
     {
+        $this->logger->info('Save like ');
         $statement = $this->connection->prepare(
             "INSERT INTO likes (uuid_like, uuid_post, uuid_user) VALUES (:uuid_like,:uuid_post,:uuid_user)");
         $statement->execute([
             ':uuid_like'=>(string)$likes->getUuidLike(),
             ':uuid_post'=>$likes->getUuidPost(),
             ':uuid_user'=>$likes->getUuidUser()]);
+        $this->logger->info("'Save like: $likes" );
     }
 
     /**

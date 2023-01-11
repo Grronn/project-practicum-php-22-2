@@ -4,6 +4,7 @@ namespace Tgu\Savenko\Blog\Repositories\CommentsRepository;
 
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 use Tgu\Savenko\Blog\Comment;
 use Tgu\Savenko\Blog\Exceptions\CommentNotFoundException;
 use Tgu\Savenko\Blog\Exceptions\InvalidArgumentException;
@@ -11,12 +12,13 @@ use Tgu\Savenko\Blog\UUID;
 
 class SqliteCommentsRepository implements CommentsRepositoryInterface
 {
-    public function __construct(private PDO $connection)
+    public function __construct(private PDO $connection, private LoggerInterface $logger)
     {
 
     }
     public function saveComment(Comment $comment): void
     {
+        $this->logger->info('Save comment ');
         $statement = $this->connection->prepare(
             "INSERT INTO comments (uuid_comment, post_uuid, author_uuid, text_comment) VALUES (:uuid_comment,:post_uuid,:author_uuid, :text_comment)");
         $statement->execute([
@@ -24,6 +26,7 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
             ':post_uuid'=>$comment->getUuidPost(),
             ':author_uuid'=>$comment->getUuidAuthor(),
             ':text_comment'=>$comment->getTextComment()]);
+        $this->logger->info("'Save comment: $comment" );
     }
 
     /**

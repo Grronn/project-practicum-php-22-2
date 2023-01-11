@@ -4,6 +4,7 @@ namespace Tgu\Savenko\Blog\Repositories\UsersRepository;
 
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 use Tgu\Savenko\Blog\Exceptions\InvalidArgumentException;
 use Tgu\Savenko\Blog\Exceptions\UserNotFoundException;
 use Tgu\Savenko\Blog\User;
@@ -12,12 +13,13 @@ use Tgu\Savenko\Person\Name;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
-    public function __construct(private PDO $connection)
+    public function __construct(private PDO $connection, private LoggerInterface $logger)
     {
 
     }
 
     public function save(User $user): void{
+        $this->logger->info('Save user ');
         $statement=$this->connection->prepare(
             "INSERT INTO users (uuid, first_name, last_name, username) VALUES (:uuid, :first_name, :last_name, :username)"
         );
@@ -28,6 +30,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             ':last_name'=> $user->getName()->getLastName(),
             ':username' => $user->getUsername(),
         ]);
+        $this->logger->info("'Save user: $user" );
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use Psr\Log\LoggerInterface;
 use Tgu\Savenko\Blog\Commands\Arguments;
 use Tgu\Savenko\Blog\Commands\CreateUserCommand;
 use Tgu\Savenko\Blog\Comment;
@@ -17,14 +18,16 @@ use Tgu\Savenko\Blog\UUID;
 use Tgu\Savenko\Person\Name;
 
 
-require_once __DIR__ . '/vendor/autoload.php';
+$conteiner = require __DIR__ .'/bootstrap.php';
 
-$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
 
-$likeRepository = new SqliteLikeRepositories($connection);
+$command = $conteiner->get(CreateUserCommand::class);
 
-$likeRepository->saveLike(new Likes(UUID::random(),'fb575e1d-15ba-4087-8380-c07dea43a2a2',
-    'bfeac2f8-8905-4a9e-99dc-29276f48c71a'));
+$logger= $conteiner-> get(LoggerInterface::class);
+try{$command->handle(Arguments::fromArgv($argv));}
+catch (ArgumentsException|CommandException $exception){
+    $logger->error($exception->getMessage(),['exception'=>$exception]);
+}
 //require_once __DIR__ . '/vendor/autoload.php';
 //
 //$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');

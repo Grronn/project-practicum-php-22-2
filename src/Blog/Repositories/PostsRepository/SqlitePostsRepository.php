@@ -4,6 +4,7 @@ namespace Tgu\Savenko\Blog\Repositories\PostsRepository;
 
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 use Tgu\Savenko\Blog\Exceptions\InvalidArgumentException;
 use Tgu\Savenko\Blog\Exceptions\PostNotFoundException;
 use Tgu\Savenko\Blog\Post;
@@ -12,12 +13,13 @@ use Tgu\Savenko\Blog\UUID;
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
 
-    public function __construct(private PDO $connection)
+    public function __construct(private PDO $connection,private LoggerInterface $logger)
     {
 
     }
     public function savePost(Post $post): void
     {
+        $this->logger->info('Save post ');
         $statement = $this->connection->prepare(
             "INSERT INTO posts (uuid_post, author_uuid, title, text_post) VALUES (:uuid_post, :author_uuid, :title, :text_post)");
         $statement->execute([
@@ -25,6 +27,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
             ':author_uuid'=>$post->getUuidAuthor(),
             ':title'=>$post->getTitlePost(),
             ':text_post'=>$post->getTextPost()]);
+        $this->logger->info("'Save post: $post" );
     }
 
     /**
