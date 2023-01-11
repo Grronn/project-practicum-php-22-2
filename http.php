@@ -3,6 +3,7 @@
 use Tgu\Savenko\Blog\Commands\CreateUserCommand;
 use Tgu\Savenko\Blog\Http\Actions\Comments\CreateComment;
 use Tgu\Savenko\Blog\Http\Actions\Posts\DeletePosts;
+use Tgu\Savenko\Blog\Http\Actions\Users\CreateUser;
 use Tgu\Savenko\Blog\Http\Actions\Users\FindByUsername;
 use Tgu\Savenko\Blog\Http\ErrorResponse;
 use Tgu\Savenko\Blog\Http\Request;
@@ -12,6 +13,7 @@ use Tgu\Savenko\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+$container= require __DIR__ . '/bootstrap.php';
 
 $request = new Request($_GET,$_SERVER,file_get_contents('php://input'));
 
@@ -41,14 +43,11 @@ catch (HttpException $exception){
 //    ],
 //];
 $routes =[
-    'POST'=>[
-        '/posts/comment'=>new CreateComment(
-            new SqliteCommentsRepository(
-                new PDO('sqlite:'.__DIR__.'/blog.sqlite')
-            )
-        )
+    'GET'=>['/users/show'=>FindByUsername::class,
     ],
-    'DELETE'=>['/post/delete'=>new DeletePosts(new SqlitePostsRepository(new PDO('sqlite:'.__DIR__.'/blog.sqlite')))],
+    'POST'=>[
+        '/users/create'=>CreateUser::class,
+    ],
 ];
 
 
@@ -56,7 +55,8 @@ if (!array_key_exists($path,$routes[$method])){
     (new ErrorResponse('Not found'))->send();
     return;
 }
-$action = $routes[$method][$path];
+$actionClassName = $routes[$method][$path];
+$action = $container->get($actionClassName);
 try {
     $response = $action->handle($request);
     $response->send();
