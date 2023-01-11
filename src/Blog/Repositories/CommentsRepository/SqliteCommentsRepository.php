@@ -59,4 +59,15 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         ]);
         return $this->getComment($statement, (string)$uuid_comment);
     }
+
+    /**
+     * @throws CommentNotFoundException
+     * @throws InvalidArgumentException
+     */
+    public function getTextComment(string $textCom):Comment
+    {
+        $statement = $this->connection->prepare("SELECT * FROM comments WHERE text_comment = :text_comment");
+        $statement->execute([':text_comment'=>(string)$textCom]);
+        return $this->getComment($statement, $textCom);
+    }
 }
