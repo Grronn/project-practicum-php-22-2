@@ -1,0 +1,25 @@
+GET http://127.0.0.1:8001/users/show?username=user1
+Some-Header: Some Value
+Content-Type: application/json
+###
+POST http://127.0.0.1:8001/users/create
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username":"nikolay123",
+  "first_name": "nikolay",
+  "last_name":"Ivanov"
+}
+###
+POST http://127.0.0.1:8001/posts/comment
+Accept: application/json
+Content-Type: application/json
+
+{
+  "uuid_author":"ec070a89-93f9-4176-bbed-da748ba77ae0",
+  "uuid_post": "71a9a1a5-caae-4bc4-9c29-ab7a91bcf002",
+  "textCom":"new textt comment"
+}
+###
+DELETE http://127.0.0.1:8001/posts?uuid_post=d19fb51f-6ce8-436c-bb87-2bcf0aee8334
